@@ -7,7 +7,8 @@ from google import genai
 from google.genai import types
 import telebot
 from telebot import types as telebot_types
-from dotenv import load_dotenv  # добавлено для загрузки .env
+import time
+from dotenv import load_dotenv  # добавил импорт
 
 # Загрузка переменных окружения из .env
 load_dotenv()
@@ -18,7 +19,7 @@ user_sessions = {}
 # Функция для получения или создания сессии Gemini для пользователя
 def get_user_chat(user_id):
     if user_id not in user_sessions:
-        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))  # теперь ключ берётся из .env
+        client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])  # теперь из .env
         model = "gemini-2.5-flash-preview-04-17"
         tools = [types.Tool(google_search=types.GoogleSearch())]
         config = types.GenerateContentConfig(
@@ -35,7 +36,7 @@ def generate_gemini_response(user_id, user_text):
     response = chat.send_message(user_text)
     return response.text
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")  # теперь ключ берётся из .env
+TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]  # теперь из .env
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 # Клавиатура с кнопкой "Новый чат"
@@ -61,4 +62,9 @@ def handle_message(message):
 
 if __name__ == "__main__":
     print("Бот запущен!")
-    bot.polling(none_stop=True)
+    while True:
+        try:
+            bot.polling(none_stop=True, timeout=60, long_polling_timeout=60)
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            time.sleep(15)  # Подождать перед повтором
