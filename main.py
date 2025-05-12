@@ -47,7 +47,7 @@ keyboard.add(telebot_types.KeyboardButton("Новый чат"))
 def new_chat_handler(message):
     user_id = message.from_user.id
     user_sessions.pop(user_id, None)  # Удаляем старую сессию
-    bot.send_message(message.chat.id, "Контекст сброшен. Начат новый чат!", reply_markup=keyboard)
+    bot.send_message(message.chat.id, "Context reset. New chat started!", reply_markup=keyboard)
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
@@ -58,13 +58,13 @@ def handle_message(message):
         response = generate_gemini_response(user_id, user_text)
         bot.send_message(message.chat.id, response, reply_markup=keyboard)
     except Exception as e:
-        bot.send_message(message.chat.id, f"Ошибка: {e}", reply_markup=keyboard)
+        bot.send_message(message.chat.id, f"Error: {e}", reply_markup=keyboard)
 
 if __name__ == "__main__":
-    print("Бот запущен!")
+    print("Bot started!")
     while True:
         try:
             bot.polling(none_stop=True, timeout=60, long_polling_timeout=60)
         except Exception as e:
-            print(f"Ошибка: {e}")
+            print(f"Error: {e}")
             time.sleep(15)  # Подождать перед повтором
